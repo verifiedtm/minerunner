@@ -1,0 +1,29 @@
+[Unit]
+Description=Minecraft Server %i
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/minecraft/server-%i
+PrivateUsers=true
+User=minecraft
+Group=gameserver
+Type=simple
+Nice=5
+UMask=002
+KillMode=mixed
+KillSignal=SIGTERM
+ProtectSystem=full
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+PrivateDevices=true
+NoNewPrivileges=true
+PrivateTmp=true
+ExecStart=/usr/local/bin/minerunner
+# ExecStop=
+Restart=on-failure
+RestartSec=60s
+
+[Install]
+WantedBy=multi-user.target

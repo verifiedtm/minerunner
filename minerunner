@@ -1,0 +1,49 @@
+#!/bin/sh
+
+print_usage() {
+    echo "minerunner [-h]"
+}
+
+OPTIND=1
+while getopts "h?" opt; do
+    case "$opt" in
+        h|\?)
+            print_usage
+            exit 0
+            ;;
+    esac
+done
+
+executable="run.sh"
+
+if [ ! -f "./$executable" ]; then
+    echo "Expected to find file $executable"
+    exit 2
+fi
+if [ ! -x "./$executable" ]; then
+    echo "File $executable is not executable"
+    exit 2
+fi
+
+
+cleanup() {
+    rm -r "$tmp_dir"
+}
+
+send_stop() {
+    echo "stop" > "$fifo"
+    wait
+}
+
+tmp_dir=$(mktemp -d)
+fifo="$tmp_dir/fifo"
+
+trap cleanup EXIT
+trap send_stop TERM HUP INT
+
+mkfifo "$fifo"
+
+command="./$executable"
+"$command" <> "$fifo" &
+
+wait
