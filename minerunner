@@ -31,8 +31,10 @@ cleanup() {
 }
 
 send_stop() {
+    trap - TERM HUP INT
     echo "stop" > "$fifo"
-    wait
+    wait "$server_pid"
+    exit $?
 }
 
 tmp_dir=$(mktemp -d)
@@ -45,5 +47,6 @@ mkfifo "$fifo"
 
 command="./$executable"
 "$command" <> "$fifo" &
+server_pid=$!
 
-wait
+wait "$server_pid"
